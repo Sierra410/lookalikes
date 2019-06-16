@@ -80,6 +80,21 @@ var alikes = [][]int{
 	{133, 160, 5760, 8192, 8193, 8194, 8195, 8196, 8197, 8198, 8199, 8200, 8201, 8202, 8232, 8233, 8239, 8287, 12288},
 }
 
+var proper = []rune{
+	//Lowercase
+	'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+	'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+	'u', 'v', 'w', 'x', 'y', 'z',
+	//Uppercase
+	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+	'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+	'U', 'V', 'W', 'X', 'Y', 'Z',
+	//Numbers
+	'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+	//Space
+	' ',
+}
+
 func isIn(i int, s []int) bool {
 	for _, v := range s {
 		if i == v {
@@ -108,24 +123,24 @@ func main() {
 		sort.Ints(s)
 	}
 
-	for _, s := range alikes {
-		s = removeDupes(s)
+	for i := range alikes {
+		alikes[i] = removeDupes(alikes[i])
 	}
 
-	for i, s := range alikes {
-		switch i {
-		case 0:
-			fmt.Printf("//Lowercase:\n")
-		case 26:
-			fmt.Printf("//Uppercase:\n")
-		case 52:
-			fmt.Printf("//Numbers:\n")
-		case 62:
-			fmt.Printf("//Whitespaces\n")
+	m := map[int]rune{}
+
+	for i := range alikes {
+		for _, r := range alikes[i] {
+			_, ok := m[r]
+			if !ok && r > 127 {
+				m[r] = proper[i]
+			}
 		}
-		fmt.Printf(
-			"%s,\n",
-			fmt.Sprintf("%#v", s)[5:],
-		)
 	}
+
+	fmt.Printf("package lookalikes\n\nvar lookup = map[rune]rune {\n")
+	for k, v := range m {
+		fmt.Printf("\t0x%x: '%c',\n", k, v)
+	}
+	fmt.Printf("}")
 }
